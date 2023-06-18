@@ -1,4 +1,7 @@
 # coding: utf-8 -*-
+from concerts import concertspage
+import concerts
+global concerts
 from home import homepage
 import home
 global home
@@ -23,6 +26,7 @@ global connection
 global get_file
 global switcher
 __mots__={
+    "/concerts":{"partiedemesmots":"concerts"},
     "/":{"partiedemesmots":"home"},
 }
 
@@ -263,6 +267,7 @@ connection.commit()
 
 
 def reloadmymodules(params = None):
+    reload(concerts)
     reload(home)
 def copy(params = None):
     #restart_program()
@@ -326,6 +331,11 @@ def addgiftcard(params = None):
 def homefunc(params):
   Program=homepage("./myhomedirectory","super website",params)
   return render_figure("myhomehtml.html",Program)
+
+
+def concertsfunc(params):
+  Program=concertspage("./myconcertsdirectory","super website",params)
+  return render_figure("myconcertshtml.html",Program)
 
 class S(BaseHTTPRequestHandler):
     def _mon_erreur(self,e):
@@ -590,6 +600,7 @@ if __name__ == "__main__":
 
 global route_post
 myroutes = {
+"/concerts":concertsfunc,
 "/":homefunc,
 }
 global menu
