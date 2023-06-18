@@ -1,4 +1,7 @@
 # coding: utf-8 -*-
+from about import aboutpage
+import about
+global about
 from concerts import concertspage
 import concerts
 global concerts
@@ -26,6 +29,7 @@ global connection
 global get_file
 global switcher
 __mots__={
+    "/about":{"partiedemesmots":"about"},
     "/concerts":{"partiedemesmots":"concerts"},
     "/":{"partiedemesmots":"home"},
 }
@@ -267,6 +271,7 @@ connection.commit()
 
 
 def reloadmymodules(params = None):
+    reload(about)
     reload(concerts)
     reload(home)
 def copy(params = None):
@@ -336,6 +341,11 @@ def homefunc(params):
 def concertsfunc(params):
   Program=concertspage("./myconcertsdirectory","super website",params)
   return render_figure("myconcertshtml.html",Program)
+
+
+def aboutfunc(params):
+  Program=aboutpage("./myaboutdirectory","super website",params)
+  return render_figure("myabouthtml.html",Program)
 
 class S(BaseHTTPRequestHandler):
     def _mon_erreur(self,e):
@@ -600,6 +610,7 @@ if __name__ == "__main__":
 
 global route_post
 myroutes = {
+"/about":aboutfunc,
 "/concerts":concertsfunc,
 "/":homefunc,
 }
