@@ -6,7 +6,6 @@ global path1
 import sqlite3  
 global codecs
 import codecs
-from multipledispatch import dispatch
 import math
 connection = sqlite3.connect("mesburgers1.db")
 connection.create_function('sqrt', 1, math.sqrt)

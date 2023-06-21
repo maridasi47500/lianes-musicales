@@ -544,7 +544,7 @@ class S(BaseHTTPRequestHandler):
             return (False, "Content NOT begin with boundary","")
         line = self.rfile.readline()
         remainbytes -= len(line)
-        fn = re.findall(r'Content-Disposition.*name="myid"*', line)
+        fn = re.findall(r'Content-Disposition.*name="myid"([\d.]*\d+)', line)
         if not fn:
             return (False, "Can't find out myid...","")
         print(self.path)
@@ -645,7 +645,7 @@ class S(BaseHTTPRequestHandler):
                 print("-- user connecté --")
             except:
                 print("aucun user connecté")
-            print "in post method"
+            print("in post method")
             myurlpath=urlpath.split("?")[0]
             print(myurlpath)
             try:
@@ -746,9 +746,9 @@ def run(server_class=HTTPServer, handler_class=S, port=8000,host="localhost"):
     httpd = server_class(server_address, handler_class)
     #print 'http://localhost:8000'
     if len(argv) == 2:
-        print 'http://'+host+':'+argv[1]
+        print('http://'+host+':'+argv[1])
     else:
-        print 'http://'+host+':'+str(port)
+        print('http://'+host+':'+str(port))
     httpd.serve_forever()
 
 if __name__ == "__main__":
