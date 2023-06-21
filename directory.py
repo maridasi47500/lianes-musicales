@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import json
 
@@ -19,6 +20,7 @@ import requests
 class directory(object):
     path1=os.getcwd()
     redirect=""
+    uryield=""
     header=""
     layout=""
     footer=""
@@ -77,9 +79,21 @@ class directory(object):
         connection.commit()
         matable=crsr.fetchall()
         return matable
+    def myyield(self,x):
 
+        self.uryield=x
+
+    def content_from_yield(self,filename):
+        contents=self.get_lines_with_path(filename)
+        index=[i for i in range(len(contents)) if "{myyield}" in contents[i]][0]
+        contents.insert(index, self.uryield)
+        x="".join(contents)
+
+        print("nb lignes du fichier:",len(x))
+        self.set_content(x)
     def content_from_file(self,filename):
         x=self.get_file_with_path(filename).read()
+
         print("longueur du fichier:",len(x))
         self.set_content(x)
     def parameters(self):
@@ -250,6 +264,12 @@ class directory(object):
             except:
                 print("erreur")
         return file
+    def get_lines_with_path(self,file):
+        thispath=self.path+"/"+file
+        print("this path:",thispath)
+        with open(thispath, "r") as f:
+          contents = f.readlines()
+        return contents
     def get_file_with_path(self,file):
 
         thispath=self.path+"/"+file

@@ -4,10 +4,11 @@ from erreur import erreur
 import sys
 import os
 print(sys.argv[1])
-if sys.argv[1] == "myclass":
+
+def route(routename):
 
 
-  filename=sys.argv[2]
+  filename=routename
   marouteget="\"/%s\"" % filename
   myhtml="my"+filename+"html"
   myfavdirectory="my%sdirectory" % filename
@@ -81,5 +82,7 @@ def {myclass}func(params):
 <p>Entrez du texte sur cette page</p>
 """
           f.write(urlayout.format(marouteget=marouteget,myclass=filename))
+if sys.argv[1] == "myclass":
+  route(sys.argv[2])
+  print("ma route get /%s a été ajoutée. Maintenant vous pouvez essayer d'y acceder" % sys.argv[2])
 
-  print("ma route get %s a été ajoutée. Maintenant vous pouvez essayer d'y acceder" % marouteget)

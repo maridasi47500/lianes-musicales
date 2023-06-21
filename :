@@ -29,8 +29,6 @@ from home import homepage
 import home
 global home
 from redirect import redirectaction
-def findaudio(n):
-  return n.split("/")[0] == "audio"
 def findimages(n):
   return n.split("/")[0] == "image"
 def returnend(n):
@@ -73,7 +71,6 @@ switcher={
 'js':'text/javascript',
 'jpg':"image/jpg",
 'jpeg':"image/jpeg",
-'wav':"audio/wav",
 'png':"image/png",
 'gif':"image/gif",
 'ico':'image/vnd.microsoft.icon'
@@ -487,12 +484,6 @@ class S(BaseHTTPRequestHandler):
                 self._set_headers(switcher["css"])
 
                 code=open(os.getcwd()+myurlpath, "rb").read().decode('utf-8')
-                self.wfile.write(code)
-            elif myurlpath.split(".")[-1] in map(returnend, filter(findaudio,switcher.values())):
-                print("le mimetype est %s et la réponse est %s" % ("audio",200))
-                self._set_headers(switcher[myurlpath.split(".")[-1]])
-
-                code=open(os.getcwd()+myurlpath, "rb").read()
                 self.wfile.write(code)
             elif myurlpath.split(".")[-1] in map(returnend, filter(findimages,switcher.values())):
                 print("le mimetype est %s et la réponse est %s" % ("png",200))

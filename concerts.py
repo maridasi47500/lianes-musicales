@@ -14,6 +14,12 @@ class concertspage(directory):
       self.content_from_file("myconcertshtml.html")
       self.title=title
       self.params=title
+      sql="select * from concerts"
+      sqlargs=()
+      templatename="_concert.html"
+      errormessage="pas de concerts"
+      tablename="concerts"
+      self.content+= self.display_collection_with_current_path(sql,sqlargs,templatename,errormessage,tablename)
       try:
         userid=params["userid"][0]
       except:

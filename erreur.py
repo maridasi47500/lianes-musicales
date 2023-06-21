@@ -12,4 +12,4 @@ class erreur(directory):
   def get_erreur(self,err):
     return self.erreur
   def get_content(self):
-    return "<p>%s</p>" % self.erreur
+    return "<h6>%s</h6><p>%s</p>" % (self.title,self.erreur)
