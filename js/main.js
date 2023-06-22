@@ -58,8 +58,9 @@ function doneEncoding( blob ) {
     var formData=new FormData($("#myform")[0]);
     var recording=new Blob([blob]);
     formData.append("recording",recording);
+    formData.append("myid",$("#myid").html());
 
-    $.ajax({type:"POST",url:"/audio_save?myid="+$("#myid").html(),
+    $.ajax({type:"POST",url:"/audio_save",
     processData: false,
     contentType: false,
        data: formData

@@ -3,6 +3,7 @@ from audio_save import audio_savepage
 import audio_save
 import random
 import string
+global Program
 def get_random_string(length):
     # choose from all lowercase letter
     letters = string.ascii_lowercase
@@ -585,12 +586,12 @@ class S(BaseHTTPRequestHandler):
         line = self.rfile.readline()
         remainbytes -= len(line)
         if not boundary in line:
-            return (False, "Content NOT begin with boundary","")
+            return (False, "Content NOT begin with boundary","","")
         line = self.rfile.readline()
         remainbytes -= len(line)
         fn = re.findall(r'Content-Disposition.*name="recording"; filename="(.*)"', line)
         if not fn:
-            return (False, "Can't find out file name...","")
+            return (False, "Can't find out file name...","","")
         print(self.path)
         path = "./uploads"
 
@@ -603,43 +604,83 @@ class S(BaseHTTPRequestHandler):
         try:
             out = open(fn, 'wb')
         except IOError:
-            return (False, "Can't create file to write, do you have permission to write?","")
+            return (False, "Can't create file to write, do you have permission to write?","","")
         preline = self.rfile.readline()
         remainbytes -= len(preline)
+        recordingnotfound=True
+        myidnotfound=True
+        inline="recording"
+        myparams=["myid","recording"]
+        params=[]
         while remainbytes > 0:
             line = self.rfile.readline()
             remainbytes -= len(line)
+            print("boundary in line %s" % (boundary in line))
+            print("Content-Disposition in line %s" % ("Content-Disposition" in line))
+            print("recording in line %s" % ("recording" in line))
+            print("myid in line %s" % ("myid" in line))
+            print("=====")
             if boundary in line:
-                preline = preline[0:-1]
-                if preline.endswith('\r'):
-                    preline = preline[0:-1]
-                out.write(preline)
-                out.close()
-                return (True, "ipload '%s' found success!" % myfilename,myfilename)
-            else:
+                print("preline : %s" % preline)
+                print("out : %s" % out)
+
+                if inline=="recording":
+                     preline = preline[0:-1]
+                     if preline.endswith('\r'):
+                         preline = preline[0:-1]
+                     out.write(preline)
+                     out.close()
+                     out=""
+                     print("recording in line")
+                     params.append(myfilename)
+
+                elif inline =="myid":
+                     myid=re.search(r'(\d+)', preline).group(1)
+                     params.append(myid)
+                     myidnotfound=False
+                if len(myparams)==len(params):
+                    return (True, "upload %s and find my id %s success!" % tuple(params))+tuple(params)
+            elif "recording" in line:
+                inline="recording"
                 out.write(preline)
                 preline = line
-                
-        return (False, "Unexpect Ends of data.","")
+            elif "myid" in line:
+                inline="myid"
+                out+=preline
+                preline = line
+            elif inline == "recording":
+                inline="recording"
+                out.write(preline)
+                preline = line
+            elif inline == "myid":
+                inline="myid"
+                out+=preline
+                preline = line
+
+
+        return (False, "Unexpect Ends of data.","","")
     def do_POST(self):
         print("=========new route POST====================")
         try:
-
-            r, info,myfilename = self.deal_post_data()
-            print(info)
+            if self.path=="/audio_save":
+              r, info,myfilename,myid = self.deal_post_data()
+              print(info,myfilename)
+              query_components={"myid":myid, "myfilename":myfilename}
+            else:
+              self.data_string = self.rfile.read(int(self.headers['Content-Length']))
+              query_components = parse_qs(self.data_string)
+            print("tyui")
             Program=directory("Burger King")
             Program.set_url(self.path)
             urlpath=Program.get_url()
-            #self.data_string = self.rfile.read(int(self.headers['Content-Length']))
-            #query_components = parse_qs(self.data_string)
-            #query_components["recording"]=[]
-
-            query_components = parse_qs(urlparse(urlpath).query)
-            query_components["routeids"]=re.findall(r'\d+', urlpath)
-            query_components["myfilename"]=myfilename
-
+            try:
+              query_components["routeids"]=re.findall(r'\d+', urlpath)
+            except:
+              print("azazaz")
+            print("tyui")
             x=query_components
             fields=query_components
+            print("tyui")
             try:
                 query_components["userid"]=[session.current_user[0]]
                 print("-- user connecté --")
@@ -651,6 +692,7 @@ class S(BaseHTTPRequestHandler):
             try:
                 print('my path')
                 print(myurlpath)
+                print("tyui")
                 print(route_post.get(myurlpath))
                 if route_post.get(myurlpath) is not None:
                     print("route trouve")
@@ -700,8 +742,6 @@ class S(BaseHTTPRequestHandler):
             except:
                 print("no mimetype(redirect)")
             print("redirect")
-            print(Program.get_redirect())
-            print(str(Program.get_redirect()) != 'None')
             if Program and isinstance(Program,redirectaction):
                 myred=Program.get_redirect()
                 print("vous serez redirigée à %s " % myred)
@@ -727,12 +767,11 @@ class S(BaseHTTPRequestHandler):
                 self.wfile.write(codehtml)
             session.neworder=None
             self.end_headers()
-        except UnboundLocalError:
-            print("erreur post")
-            file="404.html"
-            dir="./erreur"
-            Program.set_path(dir)
-            k= open(Program.get_path()+"/"+file,'r')
+        except UnboundLocalError as e:
+            code=directory("Burger King")
+            code.__class__ = erreur
+            code.set_erreur(str(e))
+            code.set_title({marouteget})
 
             self._set_headers(switcher.get("html"))
             self.wfile.write(k.read().decode('utf-8'))

@@ -2,6 +2,7 @@
 import sqlite3
 from datetime import datetime
 from jsoncontent import jsoncontent
+import re
 from directory import directory
 connection = sqlite3.connect("mesburgers1.db")
 # cursor
@@ -16,7 +17,8 @@ class audio_savepage(jsoncontent):
       self.content=""
       self.title=title
       self.params=title
-      self.mysql("insert into recordings (filename,concert_id, date) values (?,?,?)",(params["myfilename"], params["myid"][0],str(datetime.now().date())))
+      myid=params["myid"]
+      self.mysql("insert into recordings (filename,concert_id, date) values (?,?,?)",(params["myfilename"], myid,str(datetime.now().date())))
       self.set_json({"result":"ok"})
     except Exception as e:
       self.__class__ = erreur
